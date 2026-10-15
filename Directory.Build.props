@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <GameDirectory Condition="'$(GameDirectory)' == ''">D:\SteamLibrary\steamapps\common\Risk of Rain 2</GameDirectory>
+    <ModProfileDirectory Condition="'$(ModProfileDirectory)' == ''">$(APPDATA)\r2modmanPlus-local\RiskOfRain2\profiles\ModDev</ModProfileDirectory>
+    <ManagedDirectory>$(GameDirectory)\Risk of Rain 2_Data\Managed</ManagedDirectory>
+    <BepInExCore>$(ModProfileDirectory)\BepInEx\core</BepInExCore>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>
+  </PropertyGroup>
+</Project>

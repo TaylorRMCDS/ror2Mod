@@ -1,0 +1,10 @@
+{
+  "name": "TaylorsBalancePatch",
+  "version_number": "0.5.4",
+  "website_url": "",
+  "description": "Commando, Artificer, Bandit and REX balance changes with independent survivor toggles. Includes downward Disperse and Harvest's stacking Fruiting redesign.",
+  "dependencies": [
+    "bbepis-BepInExPack-5.4.2122",
+    "RiskofThunder-HookGenPatcher-1.2.9"
+  ]
+}
