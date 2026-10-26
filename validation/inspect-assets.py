@@ -109,3 +109,102 @@ assert any(d['target']['m_PathID'] == 4697279032780296349 and
            d['minimumStockCountToBeValid'] == 0 and d['maximumStockCountToBeValid'] == 0
            for d in stock_displays)
 print('PASS: Blast has one projectile, four base charges and known firing values; the reticle confirms the four-stock display cap that 0.4.1 extends.')
+
+env = UnityPy.load(str(next(bundles.glob('ror2-base-engi_static_assets*.bundle'))))
+engi_objects = {o.read().m_Name: o for o in env.objects if o.type.name == 'GameObject'}
+engi_states = {d['m_Name']: d for o in env.objects if o.type.name == 'MonoBehaviour'
+               for d in [o.read_typetree()] if 'serializedFieldsCollection' in d}
+def game_object_components(obj):
+    return [c.component.deref().read_typetree() for c in obj.read().m_Component]
+def serialized_fields(state):
+    return {f['fieldName']: f['fieldValue']['stringValue'] for f in
+            state['serializedFieldsCollection']['serializedFields']}
+engi_body = next(c for c in game_object_components(engi_objects['EngiBody']) if 'baseDamage' in c)
+walker_body = next(c for c in game_object_components(engi_objects['EngiWalkerTurretBody']) if 'baseDamage' in c)
+stationary_body = next(c for c in game_object_components(engi_objects['EngiTurretBody']) if 'baseDamage' in c)
+charge = serialized_fields(engi_states['EntityStates.Engi.EngiWeapon.ChargeGrenades'])
+mine_full = serialized_fields(engi_states['EntityStates.Engi.Mine.MineArmingFull'])
+mine_weak = serialized_fields(engi_states['EntityStates.Engi.Mine.MineArmingWeak'])
+assert engi_body['baseDamage'] == 14 and abs(engi_body['levelDamage'] - 2.8) < 1e-5
+assert walker_body['baseMaxHealth'] == 130 and abs(walker_body['baseRegen'] - 0.6) < 1e-5
+assert stationary_body['baseMaxHealth'] == 130 and abs(stationary_body['baseRegen'] - 0.6) < 1e-5
+assert charge['baseTotalDuration'] == '3' and charge['baseMaxChargeTime'] == '2' and charge['maxGrenadeCount'] == '8'
+assert mine_full['damageScale'] == '3' and mine_weak['damageScale'] == '1'
+print('PASS: Engineer assets confirm the damage, charge, mine-stage and separate mobile/stationary turret baselines.')
+
+env = UnityPy.load(str(next(bundles.glob('ror2-base-loader_static_assets*.bundle'))))
+loader_objects = {o.read().m_Name: o for o in env.objects if o.type.name == 'GameObject'}
+loader_states = {d['m_Name']: d for o in env.objects if o.type.name == 'MonoBehaviour'
+                 for d in [o.read_typetree()] if 'serializedFieldsCollection' in d}
+loader_body = next(c for c in game_object_components(loader_objects['LoaderBody']) if 'baseMaxHealth' in c)
+knuckleboom = serialized_fields(loader_states['EntityStates.Loader.SwingComboFist'])
+yank_raw = loader_states['EntityStates.Loader.FireYankHook']
+yank_projectile = next(f for f in yank_raw['serializedFieldsCollection']['serializedFields']
+                       if f['fieldName'] == 'projectilePrefab')['fieldValue']['objectValue']['m_PathID']
+yank_object = next(o for o in env.objects if o.path_id == yank_projectile)
+yank_controller = next(c for c in game_object_components(yank_object) if 'yankMassLimit' in c)
+assert loader_body['baseMaxHealth'] == 160 and loader_body['baseArmor'] == 20 and loader_body['levelMaxHealth'] == 48
+assert knuckleboom['pushAwayForce'] == '1000' and knuckleboom['damageCoefficient'] == '3.2'
+assert yank_object.read().m_Name == 'LoaderYankHook' and yank_controller['yankMassLimit'] == 250
+print('PASS: Loader assets confirm the body, exact Knuckleboom state and Spiked Fist 250-mass baseline.')
+
+env = UnityPy.load(str(next(bundles.glob('ror2-base-croco_static_assets*.bundle'))))
+croco_objects = {o.path_id: o for o in env.objects}
+croco_scripts = [o for o in env.objects if o.type.name == 'MonoBehaviour']
+croco_skills = [d for o in croco_scripts for d in [o.read_typetree()]
+                if d.get('skillNameToken', '').startswith('CROCO_')]
+neurotoxin = next(s for s in croco_skills if s['skillNameToken'] == 'CROCO_SECONDARY_NAME')
+frenzied_leap = next(s for s in croco_skills if s['skillNameToken'] == 'CROCO_UTILITY_ALT1_NAME')
+breath_skill = next(s for s in croco_skills if s['skillNameToken'] == 'CROCO_SPECIAL_ALT_NAME')
+assert neurotoxin['baseRechargeInterval'] == 2
+assert frenzied_leap['baseMaxStock'] == 2 and frenzied_leap['baseRechargeInterval'] == 10
+assert breath_skill['baseMaxStock'] == 1 and breath_skill['baseRechargeInterval'] == 12
+croco_game_objects = {o.read().m_Name: o for o in env.objects if o.type.name == 'GameObject'}
+breath_components = game_object_components(croco_game_objects['CrocoBreathProjectile'])
+breath_controller = next(c for c in breath_components if 'procCoefficient' in c and 'catalogIndex' in c)
+breath_zone = next(c for c in breath_components if 'fireFrequency' in c and 'resetFrequency' in c)
+assert breath_controller['procCoefficient'] == 1
+assert breath_zone['fireFrequency'] == 10 and breath_zone['resetFrequency'] == 4
+print('PASS: Acrid assets confirm Neurotoxin 2s, Frenzied Leap 2/10 and the exact repeated-hit Cloying Breath projectile baseline.')
+
+env = UnityPy.load(str(next(bundles.glob('ror2-base-merc_static_assets*.bundle'))))
+merc_trees = [o.read_typetree() for o in env.objects if o.type.name == 'MonoBehaviour']
+merc_skills = {d['skillNameToken']: d['activationState']['_typeName'] for d in merc_trees
+               if d.get('skillNameToken', '').startswith('MERC_')}
+assert merc_skills == {
+    'MERC_PRIMARY_NAME': 'EntityStates.Merc.Weapon.GroundLight2',
+    'MERC_SECONDARY_NAME': 'EntityStates.Merc.WhirlwindEntry',
+    'MERC_SECONDARY_ALT1_NAME': 'EntityStates.Merc.Uppercut',
+    'MERC_UTILITY_NAME': 'EntityStates.Merc.PrepAssaulter2',
+    'MERC_UTILITY_ALT1_NAME': 'EntityStates.Merc.FocusedAssaultPrep',
+    'MERC_SPECIAL_NAME': 'EntityStates.Merc.EvisDash',
+    'MERC_SPECIAL_ALT1_NAME': 'EntityStates.Merc.Weapon.ThrowEvisProjectile',
+}
+merc_primary = next(d for d in merc_trees if d.get('m_Name') == 'EntityStates.Merc.Weapon.GroundLight2')
+merc_fields = serialized_fields(merc_primary)
+assert merc_fields['damageCoefficient'] == '1.3' and merc_fields['comboFinisherDamageCoefficient'] == '1.3'
+assert merc_fields['mecanimHitboxActiveParameter'] == 'Sword.active'
+merc_machines = {d['skillNameToken']: d['activationStateMachineName'] for d in merc_trees
+                 if d.get('skillNameToken', '').startswith('MERC_')}
+assert merc_machines['MERC_PRIMARY_NAME'] == 'Weapon'
+assert merc_machines['MERC_SPECIAL_ALT1_NAME'] == 'Weapon'
+assert all(merc_machines[token] == 'Body' for token in (
+    'MERC_SECONDARY_NAME', 'MERC_SECONDARY_ALT1_NAME', 'MERC_UTILITY_NAME',
+    'MERC_UTILITY_ALT1_NAME', 'MERC_SPECIAL_NAME'))
+assert any(d.get('groupName') == 'SwordLarge' and d.get('hitBoxes') for d in merc_trees)
+expose = next(d for d in merc_trees if d.get('m_Name') == 'bdMercExpose')
+assert expose['iconSprite']['m_PathID'] != 0 and not expose['canStack']
+print('PASS: Mercenary has the SwordLarge third-swing volume, Sword.active gate, native Expose icon and verified Body/Weapon skill machines.')
+
+for survivor, body_name, acceleration in [('mage', 'MageBody', 40), ('toolbot', 'ToolbotBody', 30)]:
+    env = UnityPy.load(str(next(bundles.glob(f'ror2-base-{survivor}_static_assets*.bundle'))))
+    body_object = next(o for o in env.objects if o.type.name == 'GameObject' and o.read().m_Name == body_name)
+    body_components = game_object_components(body_object)
+    assert next(c for c in body_components if 'baseAcceleration' in c)['baseAcceleration'] == acceleration
+print('PASS: Artificer and MUL-T have distinct installed acceleration baselines of 40 and 30.')
+
+env = UnityPy.load(str(next(bundles.glob('ror2-base-clayboss_static_assets*.bundle'))))
+dunestrider = next(o for o in env.objects if o.type.name == 'GameObject' and o.read().m_Name == 'ClayBossBody')
+dunestrider_components = game_object_components(dunestrider)
+assert next(c for c in dunestrider_components if 'mass' in c and 'airControl' in c)['mass'] == 800
+print('PASS: Clay Dunestrider uses ClayBossBody with motor mass 800, within Disperse\'s mass-suitability range.')

@@ -1,0 +1,421 @@
+T4YLORSURVIVORS
+Cumulative Survivor Patch Notes - Current 1.1.1 Source
+
+
+ACRID
+=====
+
+Passive
+- Blight: Each stack lasts a fixed 8 seconds. Each damage tick has 0.1 proc
+  coefficient per stack, capped at 1.0 total per victim per tick. The cap is
+  shared across attackers. Native damage, stack scaling and tick frequency
+  remain; Blight ticks can trigger ordinary on-hit items.
+
+Secondary
+- Neurotoxin: Base cooldown increased from 2 seconds to 2.5 seconds.
+
+Utility
+- Frenzied Leap: Base charges reduced from 2 to 1.
+- Frenzied Leap: Base cooldown reduced from 10 seconds to 8 seconds.
+- Frenzied Leap: Impact is now Poisonous, following the equipped passive.
+  The existing 2-second cooldown refund per enemy hit is retained.
+
+Special
+- Cloying Breath: With Poison equipped, applies Poison every accepted tick.
+  With Blight equipped, applies Blight on ticks 1, 5, 9, etc. for each
+  cloud/enemy pair. The former extra 40% Blight chance is removed.
+  Cloud damage, tick frequency and other native properties remain.
+
+Other
+- Added spawn immunity throughout Spawn and for 2 seconds after exiting it.
+  The tail is granted only if Acrid is still alive.
+
+
+ARTIFICER
+=========
+
+Primary
+- Plasma Bolt: Damage increased from 280% to 310%.
+- Plasma Bolt: Direct and splash hits slow movement by 30% for 2 seconds.
+
+Secondary
+- Cast Nano-Spear: Frozen Mithrix and False Son bosses execute below 10% health
+  instead of 30%. Includes normal and hurt Mithrix and all three False Son boss
+  forms. Other enemies retain the 30% frozen execution threshold.
+
+Utility
+- Ion Surge: Moved from Special to Utility.
+- Ion Surge: Unlocked by default.
+- Ion Surge: Launch scales with movement speed, capped at twice its vanilla
+  base-distance travel. Vanilla movement-speed scaling is retained below the
+  new cap; the movement-speed factor is capped at 14 (base movement speed: 7).
+  Native curve and duration are retained.
+- Tectonic Blast: Aiming downward provides more aerial knockback.
+
+Special
+- Snapfreeze: Damage increased from 100% to 300%.
+- Snapfreeze: Unlocked by Artificer: Orbital Bombardment (kill 15 enemies
+  before touching the ground). Challenge reward text now names Snapfreeze.
+- Snapfreeze: Moved from Utility to Special. Placement release input and
+  cancelled-placement stock refunds now use the Special slot.
+- Snapfreeze: Frozen Mithrix and False Son bosses execute below 10% health
+  instead of 30%, covering the same boss forms as Nano-Spear. Other enemies
+  retain the 30% threshold. Frozen health-bar execution markers match the new
+  threshold; freeze duration and other execution mechanics are unchanged.
+- Flamethrower: Damage range increased from 20 to 30 meters. Both hand effects
+  extend forward by 50% to match the longer reach.
+
+Other
+- Base acceleration increased from 40 to 60. Movement speed is unchanged.
+
+
+BANDIT
+======
+
+Primary
+- Blast: Ammo capacity increased from 4 to 6 rounds, with 6 matching reticle pips.
+- Blast: Minimum interval between successful shots set to 0.3 seconds,
+  independent of attack speed, reloads and skill interrupts. Vanilla uses a
+  0.1-second minimum base duration that scales with attack speed; the added
+  elapsed-time limit prevents firing sooner than 0.3 seconds apart.
+- Blast: Firing spread and bloom buildup reduced by 50%.
+- Blast: Bullet radius increased by 20%; pierces enemies and stops at terrain.
+- Blast: Reticle pips remain centered when switching between Blast's 6-round
+  display and Burst's 4-round display.
+
+
+CAPTAIN
+=======
+
+Secondary
+- Power Tazer: Shock-immune enemies are slowed by 50% for 5 seconds.
+
+Utility
+- Orbital Probe and OGM-72 'DIABLO' Strike: Can be used in hidden realms that
+  normally block orbital skills. Stock, targeting and delivery rules remain.
+
+Special
+- Orbital Supply Beacon: Can be used in hidden realms that normally block
+  orbital skills. Normal stock, targeting and delivery rules remain.
+- Healing Beacon: Allies already at full combined health receive barrier from
+  each normal healing tick, accumulating up to 20% of maximum health.
+  Vanilla grants no barrier. Each tick grants up to 2% maximum health every
+  0.2 seconds, limited by the remaining barrier cap. Shields count toward the
+  full-health check; a tick that finishes healing does not also grant barrier.
+  Existing barrier is never removed or reduced by this cap.
+
+
+COMMANDO
+========
+
+Secondary
+- Phase Round: Initial damage increased from 300% to 320%. Each enemy pierced
+  now adds 80% of initial damage, up from vanilla's 40%. The existing additive
+  ramp now deals 320%, 576%, 832%, and so on, before other modifiers.
+- Phase Blast: Each pellet's proc coefficient increased from 0.5 to 0.7.
+  The two blasts still fire 4 pellets each at 200% damage per pellet.
+
+Utility
+- Tactical Dive: Adds 200 armor for 0.5 seconds, using the standard visible
+  ArmorBoost buff. It does not stack another armor bonus onto an active
+  ArmorBoost buff.
+
+Special
+- Suppressive Fire: Base shot count increased from 6 to 8, and damage per
+  bullet increased from 100% to 115%. Shot count still increases with attack speed.
+- Frag Grenade: Outgoing speed after enemy collisions reduced by 50%.
+  Ground and wall bounces, damage, fuse and blast radius are unchanged.
+
+
+ENGINEER
+========
+
+Primary
+- Bouncing Grenades: Base charge rate increased by 10%. Charge timing is divided
+  by 1.10 (about 90.91% of vanilla duration), not reduced by 10%. The native
+  3-second total duration becomes about 2.727 seconds, and the 2-second maximum
+  charge time becomes about 1.818 seconds, before attack-speed scaling.
+  Maximum grenade count and grenade damage are preserved.
+
+Secondary
+- Pressure Mines: Fully armed damage increased from 900% to 1000%.
+  Weak and partially armed damage are unchanged.
+
+Special
+- TR58 Carbonizer Turret: Base health regeneration increased from 0.6 to 2.0
+  health per second. Base health remains 130; health growth is unchanged.
+
+Other
+- Survivor base damage reduced from 14 to 13, and damage growth reduced from
+  +2.8 to +2.6 per level.
+
+
+HUNTRESS
+========
+
+Utility
+- Blink: Base cooldown reduced from 7 to 6 seconds.
+
+Special
+- Arrow Rain: Damage increased by 5%. The native proc coefficient is unchanged.
+- Arrow Rain: Falling arrows now fill the extended damage column.
+- Arrow Rain: Vertical reach extended to 100 meters above the targeted area,
+  including through intervening platforms. Horizontal radius is unchanged.
+
+
+LOADER
+======
+
+Secondary
+- Grapple Fist: Halves cooldown after 1 second or less attached. Flight time
+  does not count; misses and Spiked Fist receive no refund.
+
+Other
+- Base maximum health reduced from 160 to 130. Health growth remains +48 per level.
+- Base armor reduced from 20 to 10.
+
+
+MERCENARY
+=========
+
+Primary
+- Laser Sword: The third swing grants a visible Expose Ready buff while its
+  hitbox is active. The buff uses the existing Expose icon and color.
+- Laser Sword: Using a skill during that active window cancels the sword
+  animation but preserves the third-swing hitbox and Expose Ready throughout
+  the follow-up skill's preparation and execution. Both end when that skill
+  finishes or is interrupted; a later skill does not chain another extension.
+- Laser Sword: The retained sword volume follows Mercenary and preserves the
+  original swing's damage, native Expose and already-hit enemy history.
+  It does not repeatedly damage an enemy already hit by that swing or add
+  Expose to the follow-up skill's own attacks.
+
+Secondary
+- Rising Thunder: Damage increased from 550% to 600%.
+- Rising Thunder: Base duration shortened by 25%. Integrated movement curves
+  preserve base-distance travel without scaling the remaining upward velocity.
+- Whirlwind (ground/air): Faster attack speed shortens the movement animation
+  without reducing its base movement-phase distance.
+
+Utility
+- Blinding Assault and Focused Assault: Dash duration scales with attack speed
+  while preserving base dash distance. Native walls, hit-stop and interrupts remain.
+
+Special
+- Eviscerate: Preparation/entry dash accelerates with attack speed without losing
+  base dash distance. Target-searching/damage phase and target stopping remain native.
+
+
+MUL-T
+=====
+
+Primary
+- Scrap Launcher: Reload speed scales with attack speed.
+- Scrap Launcher: Explosions now deal full damage throughout their existing
+  blast radius, with no distance falloff or sweet spot.
+- Power-Saw: Direct saw kills grant 0.5s of Regenerative. Nonlethal hits,
+  DOT kills and item-proc kills do not trigger it. Works in either Power Mode slot.
+
+Other
+- Base acceleration increased from 30 to 60. Movement speed is unchanged.
+
+
+RAILGUNNER
+==========
+
+Passive
+- Magnetic Accelerator: Highlighted Weak Points and matching hit-acceptance
+  radius are 70% of vanilla linear size (49% squared-radius threshold).
+  Physical enemy hurtboxes and critical-strike conversion are unchanged.
+
+Secondary
+- M99 Sniper and HH44 Marksman: Stationary grounded shots no longer apply
+  physical self-push, preserving Bustling Fungus while firing.
+- M99 Sniper and HH44 Marksman: Shooter volume remains normal; other players'
+  listeners hear 50% firing volume on clients running the mod. Unknown ownership
+  and Wwise failures preserve native volume. Headshots/special sounds are unchanged.
+
+Utility
+- Polar Field Device: Initial burst radius increased from 10 to 15 meters,
+  matching the lasting field's existing 15-meter radius.
+- Polar Field Device: Replaces vanilla's inward pull with 1500 outward force;
+  does not hit the owner. Deployment damage and proc coefficient remain zero;
+  native enemy slow and projectile slowdown remain unchanged.
+- Polar Field Device: Post-stick deployment fuse reduced from 1s to 0.1s.
+- Polar Field Device: Railgunner and allies jump 100% higher when jumping
+  inside an active allied bubble; overlapping fields do not stack.
+- Polar Field Device: Allied landings inside the active bubble take no fall
+  damage. Fall speed, ordinary enemy damage and landings outside remain normal.
+
+Special
+- Cryocharge: Piercing shot radius increased by 20%, from 2 to 2.4 meters.
+- Cryocharge: Shared freeze executes ordinary enemies below 30% health, and
+  Mithrix/False Son boss forms below 10%, with matching health-bar markers.
+  These rules remain enabled when Artificer is disabled. Freeze duration,
+  eligibility, shot damage and piercing remain native.
+
+
+REX
+===
+
+Primary
+- DIRECTIVE: Inject: Final syringe proc coefficient increased from 0.5 to 1.0.
+  The first two syringes retain their 0.5 proc coefficient.
+
+Utility
+- DIRECTIVE: Disperse: Replaces the forward-facing sonic boom with a blast
+  directly beneath REX, affecting enemies within 13 meters of his feet and
+  applying Weaken for 4 seconds.
+- DIRECTIVE: Disperse: Pushes enemies up and away with 20 outward speed and
+  8 upward lift before normal mass resistance. Clay Dunestriders receive
+  1.5x the resulting knockback, including both outward and upward components.
+- DIRECTIVE: Disperse: Adds an upward impulse to REX's existing momentum on
+  the ground or in the air, at 90% of vanilla base airborne recoil strength.
+  The movement-speed contribution to launch scaling is halved.
+  Horizontal momentum is preserved; fast falls are slowed rather than
+  automatically reversed.
+- DIRECTIVE: Disperse: Displays a pale-green horizontal range ring that expands
+  to 13 meters, briefly holds and fades over 0.65 seconds at the cast location.
+
+Special
+- DIRECTIVE: Harvest: Damage reduced from 330% to 100%; recovery shortened from
+  1 second to 0.25 seconds at base attack speed. Adds Weaken for 4 seconds.
+- DIRECTIVE: Harvest: Adds 5 shared Fruiting stacks to the enemy and refreshes
+  the whole stack pool to 10 seconds. Reapplication adds to remaining stacks
+  rather than resetting or capping the count.
+- Fruiting: Replaces vanilla's fruit-on-death effect. Allied direct skill hits,
+  including minion attacks, have a flat 20% chance to consume 1 stack, drop
+  1 fruit and deal bonus damage equal to
+  400% of the triggering attacker's damage stat. DOT and item-proc damage
+  cannot trigger this effect.
+- Fruiting: Bonus damage cannot crit or trigger on-hit effects. Normal kill
+  rewards still apply.
+- Fruiting: Fruits heal 15% of maximum health, retaining normal team pickup
+  rules and a 20-second lifetime. Enemies use the existing fruit-cluster
+  visual indicator. No additional fruit drops occur on death.
+
+
+VOID FIEND
+==========
+
+Passive
+- Void Corruption: Out-of-combat corruption gain reduced from 3 to 2 per second.
+  In-combat gain and other corruption sources remain unchanged.
+
+Primary
+- Drown (normal): Adds distance falloff to the vanilla full-damage beam.
+  Damage stays at full strength through 50 meters, then falls linearly to
+  50% at 100 meters. Damage remains at 50% beyond 100 meters.
+  Proc coefficient, maximum range and slow are preserved; corrupted Drown
+  is unchanged.
+
+Secondary
+- Flood (corrupted): Explosion radius increased from 10 to 15 meters.
+- Flood (corrupted): Launch speed reduced from 70 to 50 m/s.
+- Flood (corrupted): Maximum flight lifetime increased from 99 to 150 seconds.
+  The separate 4-second explosion-expiry timer is also increased to 150 seconds.
+  Impacts still detonate normally; damage, proc coefficient and normal Flood
+  are unchanged.
+
+Special
+- Suppress (normal): Healing reduced from 25% to 20% maximum health.
+  Still consumes 25% corruption.
+- Suppress (corrupted): Self-damage reduced from 25% to 20% maximum health.
+  Still grants 25% corruption.
+- Suppress (corrupted): Charge and recovery phases each shortened by 50%,
+  reducing the total cast from 2 seconds to 1 second at base attack speed.
+  Native attack-speed scaling is preserved; normal Suppress timing is unchanged.
+
+
+FALSE SON
+=========
+- Lunar Tampering: Unused spikes grant 4% attack speed and 2 armor each;
+  used spikes grant 4% movement speed and 2 health regeneration each.
+- Laser of the Father refreshes existing Lunar Ruin timers on hit and applies
+  one stack every 24 consecutive ticks per enemy. Misses/new casts reset streaks.
+  At base attack speed, 24 ticks takes about 3 seconds.
+- Lunar Ruin no longer multiplies shared damage packets or counts twice for Death Mark.
+- Step of the Brothers: Zero-damage detection sweep cannot proc items;
+  explosions retain native damage and proc coefficient.
+- Laser Burst: 50% secondary restock rounds up, fixing one-stock loadouts.
+- Laser of the Father: Beam visuals update every rendered frame.
+
+SEEKER
+======
+- Reprieve: Flight speed reduced by 10%. Turning starts normal and decreases
+  linearly with speed to 80% lower at maximum flight speed.
+- Saving Grace: Keeps its +7% stat bonus and Meditate's ally effects. Seeker
+  consumes it after surviving damage at 25% combined health or lower to heal
+  75% maximum health instantly, like Power Elixir. It no longer self-revives.
+  Its native once-per-stage consumption limit remains.
+- Palm Blast: Reaching seven Tranquility grants Saving Grace to living
+  survivors. It does not gain Meditate's dead-ally revive.
+
+CHEF
+====
+Secondary
+- Ice Box: Each cast randomly selects one straight cube; the other two each have
+  slight independent random pitch and yaw within a 2.5-degree cone.
+- Boosted Ice Box: Damage reduced from 1500% to 1000%.
+Utility
+- Roll: Yes CHEF no longer cancels an active Roll.
+- Roll: Automatic step climbing is disabled during Roll, with a 60-degree slope limit
+  (or the original motor limit if lower).
+  Steep collisions and ramp crests cannot create upward launch speed.
+  Deliberate jumps remain available; normal motor settings return on exit.
+
+DRIFTER
+=======
+Utility
+- Tornado Slam: Charge and spin steering are now 3x vanilla, as confirmed.
+  Native charge steering is 180 degrees/s -> 540 degrees/s; spin steering
+  is 90 -> 270 degrees/s. Native zero-turn bounce pauses remain zero; the
+  30-degree/s recovery setting is read at 90 degrees/s. Steering values are
+  scaled only when read, preventing repeated casts from multiplying fields.
+- While actively spinning, attract unclaimed allied Junk within 15 meters
+  and line of sight. Attraction speed is capped at 30m/s, with 60m/s^2
+  acceleration and an approach limit to avoid overshooting the collector.
+  With multiple spinning Drifters, the nearest eligible teammate attracts it.
+- Pulling stops upon cancel, interruption, death, leaving the radius or loss
+  of line of sight. Charging alone does not attract Junk. Existing native
+  homing targets, pickup delay and collection rules remain unchanged.
+- Removed ALL custom boss/size ricochet rules, nonboss push suppression,
+  enemy swinging/guided throws, extra collision damage, enemy motor hooks
+  and extra combat callbacks. Boss ricochets, bounce speed/duration limits,
+  damage, ordinary knockback, Junk generation and Primary/jump cancellation
+  now use the game's original behavior.
+- The redesign removes the old collision/throw code involved in the reported
+  boss-hit runaway-speed/uncancellable/no-damage/Junk-spam failure. Offline
+  checks verify no custom collision, damage, speed or Junk-generation hooks
+  remain; in-game boss stress testing is still required.
+
+
+OPERATOR
+========
+
+Utility
+- FIREWALL: If the entire use blocks nothing and deals no damage, halve its
+  cooldown.
+- The credit is granted after the held shield and released projectile end.
+  Cooldown items apply before the 50% credit.
+- Other Operator attacks, drone damage and item-proc damage do not affect the
+  decision. Normal shield behavior, charge, damage, lifetime and stock remain.
+- Uses a default-enabled Operator / EnableUtilityChanges config switch.
+  Original FIREWALL text is retained; the added rule appears in bold purple.
+- Refund decisions run on the server and are sent to the owning client. All
+  multiplayer peers need this version with Operator changes enabled. Dead
+  bodies, replaced skills and superseded casts receive no late refund.
+
+
+CONFIGURATION (1.1.0)
+====================
+Each survivor now has separate EnableStatsChanges, EnablePassiveChanges,
+EnablePrimaryChanges, EnableSecondaryChanges, EnableUtilityChanges and/or
+EnableSpecialChanges entries. Only groups with changes appear. Restart after
+editing settings; use matching settings on all multiplayer peers.
+Existing disabled survivor settings become disabled category defaults.
+Operator has only EnableUtilityChanges. Acrid spawn immunity is under Stats.
+Artificer's Utility/Special slot swap requires both groups enabled. With only
+one enabled, those abilities retain their original slots. Shared boss freeze
+thresholds remain active while Artificer Secondary/Special or Railgunner Special
+is enabled, because the game uses one shared frozen-state execution path.

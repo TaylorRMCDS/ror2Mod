@@ -11,8 +11,14 @@ internal static class RexBalance
     internal const float HarvestRecovery = 0.25f;
     internal const float DisperseRadius = 13f;
     internal const float EnemyPushSpeed = 20f;
-    internal const float EnemyLiftSpeed = 5f;
+    internal const float EnemyLiftSpeed = 8f;
+    internal const float ClayDunestriderPushMultiplier = 1.5f;
     internal const float LaunchMultiplier = 0.9f;
+    internal static float LaunchAcceleration(float acceleration, float moveSpeed, float baseMoveSpeed)
+    {
+        float ratio = baseMoveSpeed > 0f ? moveSpeed / baseMoveSpeed : 1f;
+        return ratio > 0f ? acceleration * (1f + (ratio - 1f) * 0.5f) / ratio : acceleration;
+    }
     internal const float WeakenDuration = 4f;
     internal const int StacksPerHarvest = 5;
     internal const float FruitDuration = 10f;
@@ -28,9 +34,9 @@ internal static class RexBalance
 
     internal static string? GetDescription(string token) => token switch
     {
-        "TREEBOT_PRIMARY_DESCRIPTION" => "Fire 3 syringes for <style=cIsDamage>3x80% damage</style>. The last syringe <style=cIsDamage>Weakens</style> and <style=cIsHealing>heals for 60% of damage dealt</style>. Its <style=cIsUtility>proc coefficient is 1.0</style>; the first two remain 0.5.",
-        "TREEBOT_UTILITY_DESCRIPTION" => "Fire a <style=cIsUtility>Sonic Boom directly underneath you</style>, pushing enemies within <style=cIsUtility>13m</style> away and <style=cIsDamage>Weakening</style> them for <style=cIsUtility>4 seconds</style>. Add an upward impulse to your current momentum, from ground or air, at <style=cIsUtility>90% of the original airborne push strength</style>.",
-        "TREEBOT_SPECIAL_ALT1_DESCRIPTION" => "Fire a bolt for <style=cIsDamage>100% damage</style>, <style=cIsDamage>Weakening</style> enemies for <style=cIsUtility>4 seconds</style> and adding <style=cIsHealing>5 Fruiting stacks</style>. All stacks refresh to <style=cIsUtility>10 seconds</style>. Allied direct skill hits have a flat <style=cIsUtility>20% chance</style> to consume one stack, deal <style=cIsDamage>400% of the attacker's base damage</style> and drop a fruit that heals <style=cIsHealing>15% HP</style>. Bonus damage cannot crit and has no on-hit procs. Recovery: <style=cIsUtility>0.25 seconds</style> at base attack speed. No extra fruit drops on death.",
+        "TREEBOT_PRIMARY_DESCRIPTION" => "Fire 3 syringes for <style=cIsDamage>3x80% damage</style>. The last syringe <style=cIsDamage>Weakens</style> and <style=cIsHealing>heals for 60% of damage dealt</style>. <color=#C586FF><b>Final syringe proc coefficient is 1.0; the first two remain 0.5.</b></color>",
+        "TREEBOT_UTILITY_DESCRIPTION" => "Fire a <style=cIsUtility>Sonic Boom</style> that <style=cIsDamage>Weakens</style> all enemies hit. <color=#C586FF><b>The sonic boom fires directly underneath you in a 13m radius, pushing enemies up and away with 20 outward speed and 8 upward lift before mass resistance, and applying Weaken for 4 seconds. Clay Dunestriders receive 1.5x knockback. Add an upward impulse to your current momentum, from ground or air, at 90% of the original base airborne push strength, with half movement-speed scaling. A pale-green range ring expands to 13m and fades over 0.65 seconds.</b></color>",
+        "TREEBOT_SPECIAL_ALT1_DESCRIPTION" => "Fire a bolt that deals <style=cIsDamage><color=#C586FF><b>100%</b></color> damage</style> and <style=cIsDamage>injects</style> an enemy. <color=#C586FF><b>Apply Weaken for 4 seconds and add 5 shared Fruiting stacks, refreshing the entire pool to 10 seconds. Allied direct skill hits, including minions, have a flat 20% chance to consume one stack, deal 400% of the triggering attacker's damage stat and drop a fruit that heals 15% HP. DOT and item-proc hits cannot trigger it; bonus damage cannot crit or trigger on-hit effects. No extra fruit drops on death.</b></color> <color=#C586FF><b>Recovery: 0.25 seconds at base attack speed.</b></color>",
         _ => null
     };
 

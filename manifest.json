@@ -1,8 +1,8 @@
 {
-  "name": "TaylorsBalancePatch",
-  "version_number": "0.5.5",
+  "name": "T4ylorSurvivors",
+  "version_number": "1.1.1",
   "website_url": "",
-  "description": "Commando, Artificer, Bandit and REX balance changes with independent survivor toggles. Includes downward Disperse and Harvest's stacking Fruiting redesign.",
+  "description": "Balance changes to all survivors primarily focused on buffing or nerfing skills which are not in line with their counterparts (Tactical Dive, Blight, Polar Field, ect...)",
   "dependencies": [
     "bbepis-BepInExPack-5.4.2122",
     "RiskofThunder-HookGenPatcher-1.2.9"

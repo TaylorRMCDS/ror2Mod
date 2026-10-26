@@ -45,29 +45,29 @@ internal sealed class RexChanges : IDisposable
     {
         try
         {
-            Add(() => IL.RoR2.GlobalEventManager.OnCharacterDeath += FruitDeath,
+            if (ChangeGroups.Enabled("REX", "Special")) Add(() => IL.RoR2.GlobalEventManager.OnCharacterDeath += FruitDeath,
                 () => IL.RoR2.GlobalEventManager.OnCharacterDeath -= FruitDeath);
-            Add(() => IL.EntityStates.Treebot.Weapon.FireSonicBoom.OnEnter += DisperseOriginal,
+            if (ChangeGroups.Enabled("REX", "Utility")) Add(() => IL.EntityStates.Treebot.Weapon.FireSonicBoom.OnEnter += DisperseOriginal,
                 () => IL.EntityStates.Treebot.Weapon.FireSonicBoom.OnEnter -= DisperseOriginal);
-            Add(() => On.EntityStates.Treebot.Weapon.FireSonicBoom.OnEnter += Disperse,
+            if (ChangeGroups.Enabled("REX", "Utility")) Add(() => On.EntityStates.Treebot.Weapon.FireSonicBoom.OnEnter += Disperse,
                 () => On.EntityStates.Treebot.Weapon.FireSonicBoom.OnEnter -= Disperse);
-            Add(() => On.EntityStates.Treebot.TreebotFireFruitSeed.OnEnter += Harvest,
+            if (ChangeGroups.Enabled("REX", "Special")) Add(() => On.EntityStates.Treebot.TreebotFireFruitSeed.OnEnter += Harvest,
                 () => On.EntityStates.Treebot.TreebotFireFruitSeed.OnEnter -= Harvest);
             Add(() => On.RoR2.ProjectileCatalog.SetProjectilePrefabs += Projectiles,
                 () => On.RoR2.ProjectileCatalog.SetProjectilePrefabs -= Projectiles);
-            Add(() => On.RoR2.BuffCatalog.SetBuffDefs += Buffs,
+            if (ChangeGroups.Enabled("REX", "Special")) Add(() => On.RoR2.BuffCatalog.SetBuffDefs += Buffs,
                 () => On.RoR2.BuffCatalog.SetBuffDefs -= Buffs);
-            Add(() => RoR2Application.onLoad += LoadFruit,
+            if (ChangeGroups.Enabled("REX", "Special")) Add(() => RoR2Application.onLoad += LoadFruit,
                 () => RoR2Application.onLoad -= LoadFruit);
-            Add(() => GlobalEventManager.onServerDamageDealt += DamageDealt,
+            if (ChangeGroups.Enabled("REX", "Special")) Add(() => GlobalEventManager.onServerDamageDealt += DamageDealt,
                 () => GlobalEventManager.onServerDamageDealt -= DamageDealt);
-            Add(() => On.RoR2.HealthComponent.TakeDamageProcess += FinishDamage,
+            if (ChangeGroups.Enabled("REX", "Special")) Add(() => On.RoR2.HealthComponent.TakeDamageProcess += FinishDamage,
                 () => On.RoR2.HealthComponent.TakeDamageProcess -= FinishDamage);
-            Add(() => On.EntityStates.Drone.DroneWeapon.FireGatling.OnEnter += DroneShot,
+            if (ChangeGroups.Enabled("REX", "Special")) Add(() => On.EntityStates.Drone.DroneWeapon.FireGatling.OnEnter += DroneShot,
                 () => On.EntityStates.Drone.DroneWeapon.FireGatling.OnEnter -= DroneShot);
             Add(() => On.RoR2.Language.GetLocalizedStringByToken += Description,
                 () => On.RoR2.Language.GetLocalizedStringByToken -= Description);
-            log.LogInfo("REX changes ENABLED: final Inject proc 1.0; 13m downward Disperse; Harvest 100%/0.25s recovery; stacking Fruiting on-hit redesign.");
+            log.LogInfo("REX changes ENABLED: final Inject proc 1.0; 13m Disperse with 20 outward/8 upward push and 1.5x Clay Dunestrider knockback; Harvest 100%/0.25s recovery; stacking Fruiting on-hit redesign.");
         }
         catch (Exception error) { Fail(error); }
     }
@@ -104,10 +104,10 @@ internal sealed class RexChanges : IDisposable
                 originalProc = syringe.procCoefficient;
                 harvestProjectile = seed;
                 originalHarvestType = seed.damageType;
-                syringe.procCoefficient = 1f;
+                if (ChangeGroups.Enabled("REX", "Primary")) syringe.procCoefficient = 1f;
                 var damageType = seed.damageType;
                 damageType.damageType &= ~DamageType.FruitOnHit;
-                seed.damageType = damageType;
+                if (ChangeGroups.Enabled("REX", "Special")) seed.damageType = damageType;
             }
         }
         catch (Exception error) { Fail(error); }
@@ -202,7 +202,8 @@ internal sealed class RexChanges : IDisposable
         if (NetworkServer.active) PushEnemies(body);
         if (!Util.HasEffectiveAuthority(self.outer.networkIdentity) || !body.characterMotor) return;
 
-        float speed = Trajectory.CalculateInitialYSpeedForHeight(self.airKnockbackDistance, -body.acceleration)
+        float speed = Trajectory.CalculateInitialYSpeedForHeight(self.airKnockbackDistance,
+            -RexBalance.LaunchAcceleration(body.acceleration, body.moveSpeed, body.baseMoveSpeed))
             * RexBalance.LaunchMultiplier;
         var force = PhysForceInfo.Create();
         force.force = Vector3.up * speed;
@@ -227,6 +228,7 @@ internal sealed class RexChanges : IDisposable
         };
         search.RefreshCandidates();
         search.FilterOutGameObject(source.gameObject);
+        var clayDunestriderIndex = BodyCatalog.FindBodyIndex("ClayBossBody");
         foreach (var hurtBox in search.GetResults().Where(h => h).Distinct(new HurtBox.EntityEqualityComparer()))
         {
             var health = hurtBox.healthComponent;
@@ -242,7 +244,9 @@ internal sealed class RexChanges : IDisposable
             var rigidbody = victim.GetComponent<Rigidbody>();
             float mass = victim.characterMotor ? victim.characterMotor.mass : rigidbody ? rigidbody.mass : 1f;
             float suitability = FireSonicBoom.shoveSuitabilityCurve.Evaluate(mass);
-            health.TakeDamageForce(velocity * mass * suitability, true, true);
+            float targetMultiplier = clayDunestriderIndex != BodyIndex.None &&
+                victim.bodyIndex == clayDunestriderIndex ? RexBalance.ClayDunestriderPushMultiplier : 1f;
+            health.TakeDamageForce(velocity * mass * suitability * targetMultiplier, true, true);
             var damage = new DamageInfo
             {
                 attacker = source.gameObject, damage = 0f, procCoefficient = 0f,
@@ -342,5 +346,5 @@ internal sealed class RexChanges : IDisposable
     }
 
     private static string Description(On.RoR2.Language.orig_GetLocalizedStringByToken orig, Language self, string token) =>
-        RexBalance.GetDescription(token) ?? orig(self, token);
+        (ChangeGroups.DescriptionEnabled("REX", token) ? RexBalance.GetDescription(token) : null) ?? orig(self, token);
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BepInEx.Logging;
 using EntityStates.Bandit2.Weapon;
+using EntityStates;
 using RoR2;
 using RoR2.Skills;
 using RoR2.UI;
@@ -18,6 +19,7 @@ internal sealed class BanditChanges : IDisposable
         new ConditionalWeakTable<CrosshairController, Transform[]>();
     private SkillDef? rifleSkill;
     private int originalMaxStock;
+    private ConditionalWeakTable<CharacterBody, BlastShotClock> shotClocks = new();
 
     internal BanditChanges(ManualLogSource log) => this.log = log;
 
@@ -25,19 +27,23 @@ internal sealed class BanditChanges : IDisposable
     {
         try
         {
-            Add(() => On.RoR2.Skills.SkillCatalog.SetSkillDefs += SkillDefs,
+            if (ChangeGroups.Enabled("Bandit", "Primary")) Add(() => On.RoR2.Skills.SkillCatalog.SetSkillDefs += SkillDefs,
                 () => On.RoR2.Skills.SkillCatalog.SetSkillDefs -= SkillDefs);
-            Add(() => On.EntityStates.Bandit2.Weapon.Bandit2FirePrimaryBase.OnEnter += FireInterval,
+            if (ChangeGroups.Enabled("Bandit", "Primary")) Add(() => On.EntityStates.Bandit2.Weapon.Bandit2FirePrimaryBase.OnEnter += FireInterval,
                 () => On.EntityStates.Bandit2.Weapon.Bandit2FirePrimaryBase.OnEnter -= FireInterval);
-            Add(() => On.EntityStates.Bandit2.Weapon.Bandit2FireRifle.ModifyBullet += ReduceSpread,
+            if (ChangeGroups.Enabled("Bandit", "Primary")) Add(() => On.RoR2.GenericSkill.CanExecute += CanFireBlast,
+                () => On.RoR2.GenericSkill.CanExecute -= CanFireBlast);
+            if (ChangeGroups.Enabled("Bandit", "Primary")) Add(() => On.EntityStates.GenericBulletBaseState.FireBullet += RecordBlastShot,
+                () => On.EntityStates.GenericBulletBaseState.FireBullet -= RecordBlastShot);
+            if (ChangeGroups.Enabled("Bandit", "Primary")) Add(() => On.EntityStates.Bandit2.Weapon.Bandit2FireRifle.ModifyBullet += ReduceSpread,
                 () => On.EntityStates.Bandit2.Weapon.Bandit2FireRifle.ModifyBullet -= ReduceSpread);
-            Add(() => On.RoR2.UI.CrosshairController.Awake += ExpandBanditStockDisplay,
+            if (ChangeGroups.Enabled("Bandit", "Primary")) Add(() => On.RoR2.UI.CrosshairController.Awake += ExpandBanditStockDisplay,
                 () => On.RoR2.UI.CrosshairController.Awake -= ExpandBanditStockDisplay);
-            Add(() => On.RoR2.UI.CrosshairController.LateUpdate += CenterBanditStockPips,
+            if (ChangeGroups.Enabled("Bandit", "Primary")) Add(() => On.RoR2.UI.CrosshairController.LateUpdate += CenterBanditStockPips,
                 () => On.RoR2.UI.CrosshairController.LateUpdate -= CenterBanditStockPips);
             Add(() => On.RoR2.Language.GetLocalizedStringByToken += Description,
                 () => On.RoR2.Language.GetLocalizedStringByToken -= Description);
-            log.LogInfo("Bandit changes ENABLED: Blast has 6 rounds, a 0.2s base firing interval, and 50% lower spread and bloom.");
+            log.LogInfo("Bandit changes ENABLED: Blast has 6 rounds, a 0.3s minimum firing interval, 50% lower spread and bloom, 20% larger shot radius and enemy piercing.");
         }
         catch (Exception error)
         {
@@ -55,6 +61,7 @@ internal sealed class BanditChanges : IDisposable
         for (int i = cleanup.Count - 1; i >= 0; i--)
             try { cleanup[i](); } catch (Exception error) { log.LogError(error); }
         cleanup.Clear();
+        shotClocks = new();
     }
 
     private void SkillDefs(On.RoR2.Skills.SkillCatalog.orig_SetSkillDefs orig, SkillDef[] skillDefs)
@@ -83,12 +90,33 @@ internal sealed class BanditChanges : IDisposable
     {
         if (self.GetType() == typeof(Bandit2FireRifle))
         {
-            // The base state divides this by attack speed, so the interval
-            // remains 0.2 seconds at normal speed and scales normally with AS.
-            self.minimumBaseDuration = BanditBalance.BlastMinimumBaseInterval;
             self.spreadBloomValue *= BanditBalance.BlastBloomMultiplier;
         }
         orig(self);
+    }
+
+    private bool CanFireBlast(On.RoR2.GenericSkill.orig_CanExecute orig, GenericSkill self)
+    {
+        var body = self.characterBody;
+        if (self.skillDef == rifleSkill && body && shotClocks.TryGetValue(body, out var clock)
+            && !clock.CanFire(Time.fixedTime)) return false;
+        return orig(self);
+    }
+
+    private void RecordBlastShot(On.EntityStates.GenericBulletBaseState.orig_FireBullet orig,
+        GenericBulletBaseState self, Ray ray)
+    {
+        if (self.GetType() == typeof(Bandit2FireRifle) && self.outer && self.outer.GetComponent<CharacterBody>() is CharacterBody owner && owner.hasEffectiveAuthority)
+        {
+            var body = self.outer.GetComponent<CharacterBody>();
+            if (body)
+            {
+                var clock = shotClocks.GetValue(body, _ => new BlastShotClock());
+                if (!clock.CanFire(Time.fixedTime)) return;
+                clock.RecordShot(Time.fixedTime);
+            }
+        }
+        orig(self, ray);
     }
 
     private static void ReduceSpread(On.EntityStates.Bandit2.Weapon.Bandit2FireRifle.orig_ModifyBullet orig,
@@ -97,6 +125,8 @@ internal sealed class BanditChanges : IDisposable
         orig(self, attack);
         attack.spreadPitchScale *= BanditBalance.BlastSpreadMultiplier;
         attack.spreadYawScale *= BanditBalance.BlastSpreadMultiplier;
+        attack.radius *= BanditBalance.BlastRadiusMultiplier;
+        attack.stopperMask = LayerIndex.world.mask;
     }
 
     private void ExpandBanditStockDisplay(On.RoR2.UI.CrosshairController.orig_Awake orig, CrosshairController self)
@@ -189,5 +219,5 @@ internal sealed class BanditChanges : IDisposable
     }
 
     private static string Description(On.RoR2.Language.orig_GetLocalizedStringByToken orig,
-        Language self, string token) => BanditBalance.GetDescription(token) ?? orig(self, token);
+        Language self, string token) => (ChangeGroups.DescriptionEnabled("Bandit", token) ? BanditBalance.GetDescription(token) : null) ?? orig(self, token);
 }

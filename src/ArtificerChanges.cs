@@ -24,6 +24,10 @@ internal sealed class ArtificerChanges : IDisposable
     private SkillFamily.Variant[]? originalSpecial;
     private ProjectileDamage? wallDamage;
     private DamageTypeCombo originalWallDamageType;
+    private CharacterBody? artificerBody;
+    private float originalAcceleration;
+    private UnlockableDef? snapfreezeUnlock;
+    private string? originalUnlockNameToken;
 
     internal ArtificerChanges(ManualLogSource log) => this.log = log;
 
@@ -31,29 +35,34 @@ internal sealed class ArtificerChanges : IDisposable
     {
         try
         {
-            Add(() => IL.EntityStates.Mage.Weapon.PrepWall.FixedUpdate += WallInput,
+            if (ChangeGroups.Enabled("Artificer", "Stats")) Add(() => On.RoR2.BodyCatalog.SetBodyPrefabs += Bodies,
+                () => On.RoR2.BodyCatalog.SetBodyPrefabs -= Bodies);
+            if (ChangeGroups.Enabled("Artificer", "Utility")) Add(() => IL.EntityStates.Mage.Weapon.FireEarthShards.PlayAttackEffect += TectonicPush,
+                () => IL.EntityStates.Mage.Weapon.FireEarthShards.PlayAttackEffect -= TectonicPush);
+            if (ChangeGroups.Enabled("Artificer", "Secondary") || ChangeGroups.Enabled("Artificer", "Special")) cleanup.Add(SharedFreezeChanges.Acquire().Dispose);
+            if (ChangeGroups.SwapArtificer) Add(() => IL.EntityStates.Mage.Weapon.PrepWall.FixedUpdate += WallInput,
                 () => IL.EntityStates.Mage.Weapon.PrepWall.FixedUpdate -= WallInput);
-            Add(() => IL.EntityStates.Mage.Weapon.PrepWall.OnExit += WallRefund,
+            if (ChangeGroups.Enabled("Artificer", "Special")) Add(() => IL.EntityStates.Mage.Weapon.PrepWall.OnExit += WallRefund,
                 () => IL.EntityStates.Mage.Weapon.PrepWall.OnExit -= WallRefund);
-            Add(() => IL.EntityStates.Mage.FlyUpState.HandleMovements += LaunchSpeed,
+            if (ChangeGroups.Enabled("Artificer", "Utility")) Add(() => IL.EntityStates.Mage.FlyUpState.HandleMovements += LaunchSpeed,
                 () => IL.EntityStates.Mage.FlyUpState.HandleMovements -= LaunchSpeed);
-            Add(() => IL.EntityStates.Mage.FlyUpState.OnEnter += LaunchSource,
+            if (ChangeGroups.SwapArtificer) Add(() => IL.EntityStates.Mage.FlyUpState.OnEnter += LaunchSource,
                 () => IL.EntityStates.Mage.FlyUpState.OnEnter -= LaunchSource);
-            Add(() => IL.EntityStates.Mage.Weapon.Flamethrower.FixedUpdate += FlameVisuals,
+            if (ChangeGroups.Enabled("Artificer", "Special")) Add(() => IL.EntityStates.Mage.Weapon.Flamethrower.FixedUpdate += FlameVisuals,
                 () => IL.EntityStates.Mage.Weapon.Flamethrower.FixedUpdate -= FlameVisuals);
-            Add(() => On.EntityStates.Mage.Weapon.Flamethrower.OnEnter += FlameEnter,
+            if (ChangeGroups.Enabled("Artificer", "Special")) Add(() => On.EntityStates.Mage.Weapon.Flamethrower.OnEnter += FlameEnter,
                 () => On.EntityStates.Mage.Weapon.Flamethrower.OnEnter -= FlameEnter);
-            Add(() => On.EntityStates.Mage.Weapon.FireLightningBolt.ModifyProjectileInfo += Plasma,
+            if (ChangeGroups.Enabled("Artificer", "Primary")) Add(() => On.EntityStates.Mage.Weapon.FireLightningBolt.ModifyProjectileInfo += Plasma,
                 () => On.EntityStates.Mage.Weapon.FireLightningBolt.ModifyProjectileInfo -= Plasma);
-            Add(() => GlobalEventManager.onServerDamageDealt += Slow,
+            if (ChangeGroups.Enabled("Artificer", "Primary")) Add(() => GlobalEventManager.onServerDamageDealt += Slow,
                 () => GlobalEventManager.onServerDamageDealt -= Slow);
-            Add(() => On.RoR2.Skills.SkillCatalog.SetSkillFamilies += SwapSkills,
+            if (ChangeGroups.SwapArtificer) Add(() => On.RoR2.Skills.SkillCatalog.SetSkillFamilies += SwapSkills,
                 () => On.RoR2.Skills.SkillCatalog.SetSkillFamilies -= SwapSkills);
-            Add(() => On.RoR2.ProjectileCatalog.SetProjectilePrefabs += WallDamageSource,
+            if (ChangeGroups.Enabled("Artificer", "Special")) Add(() => On.RoR2.ProjectileCatalog.SetProjectilePrefabs += WallDamageSource,
                 () => On.RoR2.ProjectileCatalog.SetProjectilePrefabs -= WallDamageSource);
             Add(() => On.RoR2.Language.GetLocalizedStringByToken += Description,
                 () => On.RoR2.Language.GetLocalizedStringByToken -= Description);
-            log.LogInfo("Artificer changes ENABLED: Plasma Bolt 310%/30% slow for 2s, Snapfreeze Special, Ion Surge Utility/fixed launch speed, Flamethrower 30m.");
+            log.LogInfo("Artificer changes ENABLED: acceleration 60; Plasma Bolt 310%/30% slow for 2s, Snapfreeze Special/300% damage, Ion Surge Utility/move-speed scaling capped at 2x base distance, Flamethrower 30m, aim-scaled Tectonic Blast push, Mithrix/False Son boss freeze execution 10%.");
         }
         catch (Exception error)
         {
@@ -65,8 +74,12 @@ internal sealed class ArtificerChanges : IDisposable
     private void Add(Action install, Action remove) { cleanup.Add(remove); install(); }
     public void Dispose()
     {
+        if (artificerBody) artificerBody!.baseAcceleration = originalAcceleration;
+        artificerBody = null;
         if (utility != null && originalUtility != null) utility.variants = originalUtility;
         if (special != null && originalSpecial != null) special.variants = originalSpecial;
+        if (snapfreezeUnlock != null) snapfreezeUnlock.nameToken = originalUnlockNameToken;
+        snapfreezeUnlock = null;
         if (wallDamage != null) wallDamage.damageType = originalWallDamageType;
         wallDamage = null;
         originalUtility = originalSpecial = null;
@@ -76,9 +89,51 @@ internal sealed class ArtificerChanges : IDisposable
     }
 
     private static void WallInput(ILContext il) => ArtificerBalance.PatchWallInput(il.Body);
-    private static void WallRefund(ILContext il) => ArtificerBalance.PatchWallRefund(il.Body);
-    private static void LaunchSpeed(ILContext il) => ArtificerBalance.PatchLaunchSpeed(il.Body);
+    private static void WallRefund(ILContext il)
+    {
+        if (ChangeGroups.SwapArtificer) ArtificerBalance.PatchWallRefund(il.Body);
+        ArtificerBalance.PatchWallDamage(il.Body);
+    }
+    private static void LaunchSpeed(ILContext il)
+    {
+        var cursor = new ILCursor(il);
+        cursor.Goto(ArtificerBalance.LaunchSpeedSite(il.Body), MoveType.After);
+        cursor.EmitDelegate<Func<float, float>>(ArtificerBalance.CappedLaunchSpeed);
+    }
     private static void LaunchSource(ILContext il) => ArtificerBalance.PatchLaunchSource(il.Body);
+
+    private static void TectonicPush(ILContext il)
+    {
+        var aim = il.Body.Instructions.Select(i => i.Operand).OfType<FieldReference>().First(f =>
+            f.DeclaringType.FullName == "EntityStates.Mage.Weapon.FireEarthShards" && f.Name == "aimVector");
+        var cursor = new ILCursor(il);
+        cursor.Goto(ArtificerBalance.TectonicPushSite(il.Body), MoveType.After);
+        cursor.Emit(OpCodes.Ldarg_0);
+        cursor.Emit(OpCodes.Ldfld, aim);
+        cursor.EmitDelegate<Func<float, Vector3, float>>((speed, direction) =>
+            speed * ArtificerBalance.TectonicPushMultiplier(direction.y));
+    }
+
+    private void Bodies(On.RoR2.BodyCatalog.orig_SetBodyPrefabs orig, GameObject[] prefabs)
+    {
+        try
+        {
+            if (!artificerBody)
+            {
+                var body = prefabs.Single(p => p.name == "MageBody").GetComponent<CharacterBody>();
+                if (!body) throw new InvalidOperationException("Artificer's body prefab was not found.");
+                originalAcceleration = body.baseAcceleration;
+                artificerBody = body;
+                body.baseAcceleration = ArtificerBalance.BaseAcceleration;
+            }
+        }
+        catch (Exception error)
+        {
+            Dispose();
+            log.LogError($"Artificer stat patch failed; disabled Artificer changes. {error}");
+        }
+        orig(prefabs);
+    }
 
     private void SwapSkills(On.RoR2.Skills.SkillCatalog.orig_SetSkillFamilies orig, SkillFamily[] families)
     {
@@ -95,10 +150,18 @@ internal sealed class ArtificerChanges : IDisposable
                 var newS = (SkillFamily.Variant[])s.variants.Clone();
                 newU[ice] = s.variants[ion];
                 newS[ion] = u.variants[ice];
+                var unlock = s.variants[ion].unlockableDef;
+                if (!unlock || unlock.cachedName != "Skills.Mage.FlyUp")
+                    throw new InvalidOperationException("Orbital Bombardment's unlock requirement was not found.");
+                newU[ice].unlockableDef = null;
+                newS[ion].unlockableDef = unlock;
+                snapfreezeUnlock = unlock;
+                originalUnlockNameToken = unlock.nameToken;
+                unlock.nameToken = "T4YLOR_SNAPFREEZE_UNLOCK_NAME";
                 utility = u; special = s;
                 originalUtility = u.variants; originalSpecial = s.variants;
                 u.variants = newU; s.variants = newS;
-                log.LogInfo("Artificer skill slots swapped; other variants and unlock requirements preserved.");
+                log.LogInfo("Artificer skill slots swapped; Ion Surge unlocked by default, Orbital Bombardment unlocks Snapfreeze; other variants preserved.");
             }
         }
         catch (Exception error)
@@ -119,7 +182,7 @@ internal sealed class ArtificerChanges : IDisposable
                 if (!damage) throw new InvalidOperationException("Snapfreeze projectile damage was not found.");
                 originalWallDamageType = damage.damageType;
                 wallDamage = damage;
-                damage.damageType.damageSource = DamageSource.Special;
+                if (ChangeGroups.SwapArtificer) damage.damageType.damageSource = DamageSource.Special;
             }
         }
         catch (Exception error)
@@ -183,6 +246,20 @@ internal sealed class ArtificerChanges : IDisposable
         return effect;
     }
 
+    private static string? ArtificerDescription(string token)
+    {
+        if (ChangeGroups.SwapArtificer)
+        {
+            if (token == "T4YLOR_SNAPFREEZE_UNLOCK_NAME") return "Artificer: Snapfreeze";
+            if (token == "ACHIEVEMENT_MAGEAIRBORNEMULTIKILL_DESCRIPTION")
+                return "As Artificer, kill 15 enemies before touching the ground. <color=#C586FF><b>Unlocks Snapfreeze.</b></color>";
+        }
+        var text = ArtificerBalance.GetDescription(token);
+        if (!ChangeGroups.SwapArtificer && text != null)
+            text = text.Replace("Special slot.", "").Replace("Utility slot. ", "");
+        return text;
+    }
+
     private static string Description(On.RoR2.Language.orig_GetLocalizedStringByToken orig,
-        Language self, string token) => ArtificerBalance.GetDescription(token) ?? orig(self, token);
+        Language self, string token) => (ChangeGroups.DescriptionEnabled("Artificer", token) ? ArtificerDescription(token) : null) ?? orig(self, token);
 }

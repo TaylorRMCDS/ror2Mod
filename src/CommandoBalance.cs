@@ -23,11 +23,11 @@ internal static class CommandoBalance
 
     internal static string? GetDescription(string token) => token switch
     {
-        "COMMANDO_SECONDARY_DESCRIPTION" => "Fire a <style=cIsDamage>piercing</style> bullet for <style=cIsDamage>320% damage</style>. Deals <style=cIsDamage>80%</style> more damage every time it passes through an enemy.",
-        "COMMANDO_SECONDARY_ALT1_DESCRIPTION" => "Fire two close-range blasts that deal <style=cIsDamage>8x200% damage</style> total. Each pellet has a <style=cIsUtility>0.7 proc coefficient</style>.",
-        "COMMANDO_UTILITY_DESCRIPTION" => "<style=cIsUtility>Roll</style> a short distance. Gain <style=cIsUtility>200 armor</style> for <style=cIsUtility>0.5 seconds</style>.",
-        "COMMANDO_SPECIAL_DESCRIPTION" => "<style=cIsDamage>Stunning</style>. Fire <style=cIsDamage>8 shots</style> for <style=cIsDamage>115% damage</style> per bullet. The number of shots increases with attack speed.",
-        "COMMANDO_SPECIAL_ALT1_DESCRIPTION" => "Throw a grenade that explodes for <style=cIsDamage>700% damage</style>. Bounces off enemies with <style=cIsUtility>50% less speed</style>. Can hold up to 2.",
+        "COMMANDO_SECONDARY_DESCRIPTION" => "Fire a <style=cIsDamage>piercing</style> bullet for <style=cIsDamage><color=#C586FF><b>320%</b></color> damage</style>. Deals <style=cIsDamage><color=#C586FF><b>80%</b></color></style> more damage every time it passes through an enemy.",
+        "COMMANDO_SECONDARY_ALT1_DESCRIPTION" => "Fire two close-range blasts that deal <style=cIsDamage>8x200% damage</style> total. <color=#C586FF><b>Each pellet has a 0.7 proc coefficient.</b></color>",
+        "COMMANDO_UTILITY_DESCRIPTION" => "<style=cIsUtility>Roll</style> a short distance. <color=#C586FF><b>Gain 200 armor for 0.5 seconds.</b></color>",
+        "COMMANDO_SPECIAL_DESCRIPTION" => "<style=cIsDamage>Stunning</style>. Fire repeatedly for <style=cIsDamage><color=#C586FF><b>115%</b></color> damage</style> per bullet. The number of shots increases with attack speed. <color=#C586FF><b>Fires 8 shots at base attack speed.</b></color>",
+        "COMMANDO_SPECIAL_ALT1_DESCRIPTION" => "Throw a grenade that explodes for <style=cIsDamage>700% damage</style>. Can hold up to 2. <color=#C586FF><b>Bounces off enemies with 50% less speed.</b></color>",
         _ => null
     };
 

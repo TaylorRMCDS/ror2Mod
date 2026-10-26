@@ -7,8 +7,23 @@
     <Compile Include="../src/CommandoBalance.cs" Link="CommandoBalance.cs" />
     <Compile Include="../src/ArtificerBalance.cs" Link="ArtificerBalance.cs" />
     <Compile Include="../src/BanditBalance.cs" Link="BanditBalance.cs" />
+    <Compile Include="../src/CaptainBalance.cs" Link="CaptainBalance.cs" />
+    <Compile Include="../src/HuntressBalance.cs" Link="HuntressBalance.cs" />
     <Compile Include="../src/RexBalance.cs" Link="RexBalance.cs" />
+    <Compile Include="../src/MultBalance.cs" Link="MultBalance.cs" />
+    <Compile Include="../src/EngineerBalance.cs" Link="EngineerBalance.cs" />
+    <Compile Include="../src/LoaderBalance.cs" Link="LoaderBalance.cs" />
+    <Compile Include="../src/AcridBalance.cs" Link="AcridBalance.cs" />
+    <Compile Include="../src/MercenaryBalance.cs" Link="MercenaryBalance.cs" />
+    <Compile Include="../src/RailgunnerBalance.cs" Link="RailgunnerBalance.cs" />
+    <Compile Include="../src/VoidFiendBalance.cs" Link="VoidFiendBalance.cs" />
+    <Compile Include="../src/FalseSonBalance.cs" Link="FalseSonBalance.cs" />
+    <Compile Include="../src/SeekerBalance.cs" Link="SeekerBalance.cs" />
+    <Compile Include="../src/ChefBalance.cs" Link="ChefBalance.cs" />
+    <Compile Include="../src/DrifterBalance.cs" Link="DrifterBalance.cs" />
+    <Compile Include="../src/OperatorBalance.cs" Link="OperatorBalance.cs" />
     <Compile Include="../src/AfterDamageQueue.cs" Link="AfterDamageQueue.cs" />
     <Reference Include="Mono.Cecil" HintPath="$(BepInExCore)\Mono.Cecil.dll" />
+    <Reference Include="MonoMod.Utils" HintPath="$(BepInExCore)\MonoMod.Utils.dll" />
   </ItemGroup>
 </Project>
